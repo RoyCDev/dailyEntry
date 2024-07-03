@@ -21,27 +21,28 @@ app.use(session({
 }))
 
 app.post("/signup", async (req, res) => {
-    res.send(await signup(req.body))
+    const { message, code } = await signup(req.body)
+    res.status(code).json({ message })
 })
 
 app.post("/login", async (req, res) => {
-    const msg = await login(req.body);
-    if (msg === "login successfully") {
-        req.session.user = req.body.username;
-        req.session.isAuthenticated = true;
+    const { message, userid, code } = await login(req.body)
+    if (code === 200) {
+        req.session.user = { id: userid }
+        req.session.isAuthenticated = true
     }
-    res.send(msg)
+    res.status(code).json({ message })
 })
 
 app.post("/logout", (req, res) => {
     req.session.destroy()
     res.clearCookie("connect.sid")
-    res.send("logout successfully")
+    res.status(200).json({ message: "logout successfully" })
 })
 
 // app.use((err, req, res, next) => {
 //     console.error(err.stack)
-//     res.status(500).send('Something broke!')
+//     res.status(500).json({ message: 'Something broke!' })
 // })
 
 app.listen(3000, () => {

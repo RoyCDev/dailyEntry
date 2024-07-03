@@ -17,9 +17,9 @@ const signup = async ({ username, email, password }) => {
         const hashed = await bcrypt.hash(password, 10)
         const q = "INSERT INTO user VALUE (NULL, ?, ?, ?)"
         await pool.execute(q, [username, email, hashed])
-        return "signup successfully"
+        return { message: "signup successfully", code: 201 }
     }
-    return "username or email is already used"
+    return { message: "username and/ or email is already used", code: 409 }
 }
 
 const login = async ({ username, password }) => {
@@ -27,9 +27,9 @@ const login = async ({ username, password }) => {
     const [res] = await pool.execute(q, [username])
     if (res.length !== 0) {
         const match = await bcrypt.compare(password, res[0].password)
-        if (match) return "login successfully"
+        if (match) return { message: "login successfully", userid: res[0].id, code: 200 }
     }
-    return "incorrect username/ password"
+    return { message: "incorrect username and/ or password", code: 401 }
 }
 
 export { signup, login }
