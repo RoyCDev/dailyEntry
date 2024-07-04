@@ -3,7 +3,7 @@ import dotenv from 'dotenv'
 import cors from 'cors'
 
 import session from "express-session"
-import { signup, login } from "./controller.js"
+import { signup, login, addGoal, getGoals, deleteGoal } from "./controller.js"
 
 dotenv.config()
 
@@ -38,6 +38,30 @@ app.post("/logout", (req, res) => {
     req.session.destroy()
     res.clearCookie("connect.sid")
     res.status(200).json({ message: "logout successfully" })
+})
+
+app.get("/goal", async (req, res) => {
+    if (req.session.isAuthenticated) {
+        const { goals, code } = await getGoals(req.session.user.id)
+        return res.status(code).json({ goals })
+    }
+    return res.status(401).json({ message: "unauthoirzed access" })
+})
+
+app.post("/goal", async (req, res) => {
+    if (req.session.isAuthenticated) {
+        const { message, code } = await addGoal(req.body, req.session.user.id)
+        return res.status(code).json({ message })
+    }
+    return res.status(401).json({ message: "unauthoirzed access" })
+})
+
+app.delete("/goal/:id", async (req, res) => {
+    if (req.session.isAuthenticated) {
+        const { message, code } = await deleteGoal(req.params.id)
+        return res.status(code).json({ message })
+    }
+    return res.status(401).json({ message: "unauthoirzed access" })
 })
 
 // app.use((err, req, res, next) => {
