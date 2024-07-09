@@ -1,6 +1,6 @@
-import AuthForm from "./AuthForm";
-import GoalPage from "./GoalPage";
-import EntryPage from "./EntryPage";
+import AuthForm from "./src/AuthForm";
+import GoalPage from "./src/pages/GoalPage";
+import EntryPage from "./src/pages/EntryPage";
 
 function App() {
     return (
@@ -9,6 +9,7 @@ function App() {
             <br />
             <br />
             <EntryPage></EntryPage>
+            {/* <GoalPage></GoalPage> */}
         </>
     )
 }

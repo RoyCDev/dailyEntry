@@ -17,12 +17,12 @@ function AuthForm() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     const endpoint = isSignupMode ? "signup" : "login"
-    const res = await entryClient.post(`/${endpoint}`, inputs)
+    const res = await entryClient.post(`/auth/${endpoint}`, inputs)
     console.log(res.data)
   }
 
   const handleLogout = async () => {
-    const res = await entryClient.post("/logout")
+    const res = await entryClient.post("/auth/logout")
     console.log(res.data)
   }
 
