@@ -1,14 +1,5 @@
-import mysql from "mysql2/promise"
-import dotenv from 'dotenv'
+import pool from "../db.js"
 import bcrypt from "bcrypt"
-
-dotenv.config()
-const pool = mysql.createPool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_DATABASE
-})
 
 const signup = async ({ username, email, password }) => {
     const q = "SELECT * FROM user WHERE username = ? OR email = ?"
@@ -32,22 +23,4 @@ const login = async ({ username, password }) => {
     return { message: "incorrect username and/ or password", code: 401 }
 }
 
-const addGoal = async ({ desc, priority }, userid) => {
-    const q = "INSERT INTO goal VALUE (NULL, ?, ?, ?, NOW(), NULL)"
-    await pool.execute(q, [userid, desc, priority])
-    return { message: "goal is added successfully", code: 201 }
-}
-
-const getGoals = async (userid) => {
-    const q = "SELECT * FROM goal WHERE user_id = ?"
-    const [res] = await pool.execute(q, [userid])
-    return { goals: res, code: 201 }
-}
-
-const deleteGoal = async (goalid) => {
-    const q = "DELETE FROM goal WHERE id = ?"
-    await pool.execute(q, [goalid])
-    return ({ message: "goal is deleted successfully", code: 200 })
-}
-
-export { signup, login, addGoal, getGoals, deleteGoal }
+export { signup, login }

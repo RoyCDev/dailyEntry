@@ -1,6 +1,6 @@
-import Goal from "./Goal"
+import Goal from "../Goal.jsx"
 import { useState } from "react"
-import entryClient from "../util.js"
+import entryClient from "../../util.js"
 
 function GoalPage() {
     const [goals, setGoals] = useState([])
@@ -11,18 +11,18 @@ function GoalPage() {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        const res = await entryClient.post("/goal", inputs)
+        const res = await entryClient.post("/goals", inputs)
         console.log(res.data)
     }
 
     const handleClick = async () => {
-        const res = await entryClient.get("/goal")
+        const res = await entryClient.get("/goals")
         setGoals(res.data.goals)
         console.log(res.data.goals)
     }
 
     const handleDelete = async (id) => {
-        const res = await entryClient.delete(`/goal/${id}`)
+        const res = await entryClient.delete(`/goals/${id}`)
         setGoals(prev => prev.filter(goal => goal.id !== id))
     }
 
