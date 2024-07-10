@@ -1,4 +1,5 @@
-import entryClient from '../util.js'
+import { FormControl, FormLabel, Input, Button } from '@chakra-ui/react'
+import entryClient from '../../util.js'
 import { useState } from 'react'
 
 function AuthForm() {
@@ -29,20 +30,25 @@ function AuthForm() {
   return (
     <>
       <form action="" onSubmit={handleSubmit}>
-        <label htmlFor="username"></label>
-        Username: <input type="text" name="username" id="username" value={inputs.username || ""} onChange={handleChange} />
-        <br />
+        <FormControl>
+          <FormLabel>Username</FormLabel>
+          <Input type="text" name="username" bg="white" value={inputs.username || ""} onChange={handleChange}></Input>
+        </FormControl>
+
         {isSignupMode && (
-          <>
-            <label htmlFor="email"></label>
-            Email: <input type="email" name="email" id="email" value={inputs.email || ""} onChange={handleChange} />
-            <br />
-          </>)
-        }
-        <label htmlFor="password"></label>
-        Password: <input type="password" name="password" id="password" value={inputs.password || ""} onChange={handleChange} />
+          <FormControl>
+            <FormLabel>Email</FormLabel>
+            <Input type="email" name="email" bg="white" value={inputs.email || ""} onChange={handleChange}></Input>
+          </FormControl>
+        )}
+
+        <FormControl>
+          <FormLabel>Password</FormLabel>
+          <Input type="password" name="password" bg="white" value={inputs.password || ""} onChange={handleChange}></Input>
+        </FormControl>
+
         <br />
-        <button>{isSignupMode ? "signup" : "login"}</button>
+        <Button type="submit">{isSignupMode ? "signup" : "login"}</Button>
       </form>
 
       {isSignupMode ?

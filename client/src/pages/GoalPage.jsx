@@ -1,4 +1,4 @@
-import Goal from "../Goal.jsx"
+import Goal from "../components/Goal"
 import { useState } from "react"
 import entryClient from "../../util.js"
 
