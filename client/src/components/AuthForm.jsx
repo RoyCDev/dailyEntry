@@ -1,61 +1,41 @@
-import { FormControl, FormLabel, Input, Button } from '@chakra-ui/react'
+import FormInput from './FormInput'
+import { useForm } from 'react-hook-form'
+import { Button } from '@chakra-ui/react'
 import entryClient from '../../util.js'
 import { useState } from 'react'
 
 function AuthForm() {
-  const [inputs, setInputs] = useState({})
+  const { register, handleSubmit } = useForm()
   const [isSignupMode, setIsSignupMode] = useState(false)
-
-  const handleChange = (e) => {
-    setInputs(prev => ({ ...prev, [e.target.name]: e.target.value }))
-  }
 
   const toggleMode = () => {
     setIsSignupMode(prev => !prev)
-    setInputs({})
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
+  const onSubmit = async (inputs) => {
     const endpoint = isSignupMode ? "signup" : "login"
     const res = await entryClient.post(`/auth/${endpoint}`, inputs)
     console.log(res.data)
   }
 
-  const handleLogout = async () => {
-    const res = await entryClient.post("/auth/logout")
-    console.log(res.data)
-  }
-
   return (
     <>
-      <form action="" onSubmit={handleSubmit}>
-        <FormControl>
-          <FormLabel>Username</FormLabel>
-          <Input type="text" name="username" bg="white" value={inputs.username || ""} onChange={handleChange}></Input>
-        </FormControl>
+      <form action="" onSubmit={handleSubmit(onSubmit)}>
+        <FormInput label="Username" type="text" name="username" register={register} />
+        {isSignupMode &&
+          <FormInput label="Email" type="email" name="email" register={register} />
+        }
+        <FormInput label="Password" type="password" name="password" register={register} />
 
-        {isSignupMode && (
-          <FormControl>
-            <FormLabel>Email</FormLabel>
-            <Input type="email" name="email" bg="white" value={inputs.email || ""} onChange={handleChange}></Input>
-          </FormControl>
-        )}
-
-        <FormControl>
-          <FormLabel>Password</FormLabel>
-          <Input type="password" name="password" bg="white" value={inputs.password || ""} onChange={handleChange}></Input>
-        </FormControl>
-
-        <br />
-        <Button type="submit">{isSignupMode ? "signup" : "login"}</Button>
+        <Button type="submit" w="100%" colorScheme="brand">
+          {isSignupMode ? "signup" : "login"}
+        </Button>
       </form>
 
       {isSignupMode ?
         <p>Already have an account? <span onClick={toggleMode}>Sign in</span></p> :
         <p>Don't have an account? <span onClick={toggleMode}>Create One</span></p>
       }
-      <button onClick={handleLogout}>Logout</button>
     </>
   )
 }
