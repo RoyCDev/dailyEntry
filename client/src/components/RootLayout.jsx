@@ -4,12 +4,15 @@ import SideBar from "./SideBar"
 
 function RootLayout() {
     return (
-        <Grid templateColumns="repeat(5, 1fr)">
-            <GridItem bg="#51645d" color="white" h="100vh" px={5} pt={5}>
+        <Grid templateColumns="repeat(20, 1fr)">
+            <GridItem bg="#51645d" color="white" p={5}
+                h={{ md: "100vh" }}
+                colSpan={{ base: 20, md: 6, lg: 5, xl: 4 }}>
                 <SideBar />
             </GridItem>
 
-            <GridItem colSpan={4} bg="#e8e8e8" px={5} pt={5}>
+            <GridItem bg="#e8e8e8" px={5} pt={5}
+                colSpan={{ base: 20, md: 14, lg: 15, xl: 16 }} >
                 <Outlet />
             </GridItem>
         </Grid >

@@ -6,11 +6,6 @@ function SideBar() {
     const today = new Date().toLocaleDateString()
     const navigate = useNavigate()
 
-    const linkStyle = {
-        backgroundColor: "rgba(255,255,255,0.3)",
-        padding: "0.2em"
-    }
-
     const handleLogout = async () => {
         const res = await entryClient.post("/auth/logout")
         navigate("/auth")
@@ -34,7 +29,16 @@ function SideBar() {
             </ListItem>
 
             <ListItem>
-                <NavLink to="/entry">New Entry</NavLink>
+                <NavLink to="/entry">
+                    {/* style={({ isActive }) => {
+                        return {
+                            backgroundColor: isActive ? "red" : "",
+                            display: "block",
+                            padding: ".25em 0",
+                            borderRadius: "5px"
+                        }
+                    }}> */}
+                    New Entry</NavLink>
             </ListItem>
             <ListItem>
                 <NavLink>Journal History</NavLink>
