@@ -1,13 +1,12 @@
 import { FormControl, FormLabel, FormErrorMessage, Input } from '@chakra-ui/react'
 
-function FormInput({ label, type, name, register, validation = {}, message }) {
+function FormInput({ label, type, register, message }) {
     return (
         <FormControl isInvalid={!!message}>
             <FormLabel fontWeight={400} fontSize="sm" mb={0.5} color="brand.600">
                 {label}
             </FormLabel>
-            <Input type={type} bg="white" borderRadius={12} {...register(name, validation)} />
-
+            <Input type={type} bg="white" borderRadius={12} {...register} />
             <FormErrorMessage>{message}</FormErrorMessage>
         </FormControl>
     )

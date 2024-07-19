@@ -4,9 +4,8 @@ import SideBar from "./SideBar"
 
 function RootLayout() {
     return (
-        <Grid templateColumns="repeat(20, 1fr)">
+        <Grid templateColumns="repeat(20, 1fr)" h={{ md: "100vh" }}>
             <GridItem bg="#51645d" color="white" p={5}
-                h={{ md: "100vh" }}
                 colSpan={{ base: 20, md: 6, lg: 5, xl: 4 }}>
                 <SideBar />
             </GridItem>

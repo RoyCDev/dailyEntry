@@ -1,6 +1,6 @@
 import LoginForm from "../components/LoginForm";
 import SignUpForm from "../components/SignUpForm";
-import { Box, Flex, Heading, Image, Text } from "@chakra-ui/react";
+import { Box, Flex, Heading, Image, Text, useToast } from "@chakra-ui/react";
 import journalImg from "../assets/journal.png"
 import { useState } from "react";
 
@@ -10,28 +10,26 @@ function AuthPage() {
         setIsSignupMode(prev => !prev)
     }
 
-    // const toast = useToast()
-    // const toastConfig = {
-    //   status: "error",
-    //   description: "ads",
-    //   position: "top-right",
-    //   variant: "left-accent",
-    //   duration: 2500,
-    //   isClosable: true
-    // }
+    const toast = useToast()
+    const toastConfig = (status) => ({
+        status: status,
+        position: "top-right",
+        duration: 2500,
+        isClosable: true
+    })
 
     return (
         <Flex
-            px={6}
-            pt={{ base: 3, md: 24 }}
+            px={8}
+            pt={{ base: 3, md: 20 }}
             gap={{ lg: 2, xl: 8 }}
             justifyContent="center">
             <Box w={{ base: "100%", lg: "385px", xl: "425px" }}>
                 <Heading as="h1" fontWeight={400}>Hello!</Heading>
                 <Text pt={1} pb={8}>Start documenting your life and goals!</Text>
                 {isSignupMode ?
-                    <SignUpForm toggleMode={toggleMode} /> :
-                    <LoginForm toggleMode={toggleMode} />}
+                    <SignUpForm toggleMode={toggleMode} toast={toast} toastConfig={toastConfig} /> :
+                    <LoginForm toggleMode={toggleMode} toast={toast} toastConfig={toastConfig} />}
             </Box>
             <Image src={journalImg} alignSelf="center"
                 boxSize={{ base: "275px", lg: "315px", xl: "400px" }}
