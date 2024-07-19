@@ -1,5 +1,5 @@
 import RootLayout from "./components/RootLayout"
-import AuthForm from "./components/AuthForm";
+import AuthPage from "./pages/AuthPage";
 import GoalPage from "./pages/GoalPage";
 import EntryPage from "./pages/EntryPage";
 
@@ -8,7 +8,7 @@ import { Route, RouterProvider, createBrowserRouter, createRoutesFromElements } 
 const router = createBrowserRouter(
     createRoutesFromElements(
         <Route path="/" element={<RootLayout />}>
-            <Route path="/auth" element={<AuthForm />} />
+            <Route path="/auth" element={<AuthPage />} />
             <Route path="/goal" element={<GoalPage />} />
             <Route path="/entry" element={<EntryPage />} />
         </Route>
