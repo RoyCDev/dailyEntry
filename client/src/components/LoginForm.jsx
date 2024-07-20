@@ -32,7 +32,7 @@ function LoginForm({ toggleMode, toast, toastConfig }) {
     }
 
     return (
-        <form action="" autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
+        <form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
             <VStack gap={4}>
                 <FormInput label="Username" type="text"
                     register={{ ...register("username") }}
