@@ -9,9 +9,9 @@ import {
     Button
 } from '@chakra-ui/react'
 
-function GoalDeleteModal({ isOpen, onOpen, onClose }) {
+function GoalDeleteModal({ isOpen, onModalClose, onDelete }) {
     return (
-        <Modal isOpen={isOpen} onClose={onClose}>
+        <Modal isOpen={isOpen} onClose={onModalClose}>
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader>Delete goal</ModalHeader>
@@ -21,10 +21,10 @@ function GoalDeleteModal({ isOpen, onOpen, onClose }) {
                 </ModalBody>
 
                 <ModalFooter>
-                    <Button colorScheme='brand' mr={2} onClick={onClose}>
+                    <Button colorScheme='brand' mr={2} onClick={onDelete}>
                         Yes
                     </Button>
-                    <Button variant='ghost' onClick={onClose}>No</Button>
+                    <Button variant='ghost' onClick={onModalClose}>No</Button>
                 </ModalFooter>
             </ModalContent>
         </Modal>

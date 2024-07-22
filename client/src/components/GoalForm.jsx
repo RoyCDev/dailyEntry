@@ -1,7 +1,7 @@
 import FormInput from "../components/FormInput"
 import { useForm } from "react-hook-form"
 import { HStack, Select } from "@chakra-ui/react"
-import entryClient from "../../util.js"
+import { entryClient } from "../../util.js"
 
 function GoalForm({ onSubmit }) {
     const {

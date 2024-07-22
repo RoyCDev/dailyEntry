@@ -4,9 +4,9 @@ import { Button, Text, HStack, VStack } from '@chakra-ui/react'
 
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
-import entryClient from '../../util.js'
+import { entryClient, toastConfig } from '../../util.js'
 
-function SignUpForm({ toggleMode, toast, toastConfig }) {
+function SignUpForm({ toggleMode, toast }) {
     const schema = yup.object({
         username: yup.string().required(),
         email: yup.string().email("invalid email format").required(),

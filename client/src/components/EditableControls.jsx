@@ -1,7 +1,7 @@
 import { useEditableControls, ButtonGroup, Button } from "@chakra-ui/react"
 import { CheckIcon, EditIcon, DeleteIcon, CloseIcon } from '@chakra-ui/icons'
 
-function EditableControls({ onModalOpen, onDelete }) {
+function EditableControls({ onModalOpen }) {
     const {
         isEditing,
         getSubmitButtonProps,
@@ -27,7 +27,6 @@ function EditableControls({ onModalOpen, onDelete }) {
                 Edit
             </Button>
             <Button leftIcon={<DeleteIcon />} fontWeight="400"
-                // onClick={() => onDelete(goal.id)}>
                 onClick={onModalOpen}>
                 Delete
             </Button>

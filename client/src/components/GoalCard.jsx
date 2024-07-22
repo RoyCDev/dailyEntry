@@ -17,7 +17,7 @@ import {
 import { useRef } from 'react'
 import EditableControls from './EditableControls'
 
-function GoalCard({ goal, onModalOpen, onDelete }) {
+function GoalCard({ goal, onModalOpen }) {
     const ref = useRef()
     const priorityColors = {
         high: "green",
@@ -38,7 +38,8 @@ function GoalCard({ goal, onModalOpen, onDelete }) {
                         <EditablePreview />
                         <EditableTextarea resize="none" />
                         <Portal containerRef={ref}>
-                            <EditableControls onModalOpen={onModalOpen} onDelete={onDelete} />
+                            <EditableControls
+                                onModalOpen={() => onModalOpen(goal)} />
                         </Portal>
                     </Editable>
                 </CardBody>

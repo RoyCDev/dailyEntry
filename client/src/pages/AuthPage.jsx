@@ -11,12 +11,6 @@ function AuthPage() {
     }
 
     const toast = useToast()
-    const toastConfig = (status) => ({
-        status: status,
-        position: "top-right",
-        duration: 2500,
-        isClosable: true
-    })
 
     return (
         <Flex
@@ -28,8 +22,8 @@ function AuthPage() {
                 <Heading as="h1" fontWeight={400}>Hello!</Heading>
                 <Text pt={1} pb={8}>Start documenting your life and goals!</Text>
                 {isSignupMode ?
-                    <SignUpForm toggleMode={toggleMode} toast={toast} toastConfig={toastConfig} /> :
-                    <LoginForm toggleMode={toggleMode} toast={toast} toastConfig={toastConfig} />}
+                    <SignUpForm toggleMode={toggleMode} toast={toast} /> :
+                    <LoginForm toggleMode={toggleMode} toast={toast} />}
             </Box>
             <Image src={journalImg} alignSelf="center"
                 boxSize={{ base: "275px", lg: "315px", xl: "400px" }}

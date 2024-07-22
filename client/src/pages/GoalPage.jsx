@@ -3,12 +3,14 @@ import GoalForm from "../components/GoalForm.jsx"
 import GoalDeleteModal from "../components/GoalDeleteModal.jsx"
 
 import { useState, useEffect } from "react"
-import { VStack, useDisclosure } from "@chakra-ui/react"
-import entryClient from "../../util.js"
+import { VStack, useDisclosure, useToast } from "@chakra-ui/react"
+import { entryClient, toastConfig } from "../../util.js"
 
 function GoalPage() {
     const [goals, setGoals] = useState([])
+    const [selectedGoal, setSelectedGoal] = useState({})
     const { isOpen, onOpen, onClose } = useDisclosure()
+    const toast = useToast()
 
     useEffect(() => {
         const fetchGoals = async () => {
@@ -18,9 +20,26 @@ function GoalPage() {
         fetchGoals()
     }, [])
 
-    const handleDelete = async (id) => {
-        const res = await entryClient.delete(`/goals/${id}`)
-        setGoals(prev => prev.filter(goal => goal.id !== id))
+    const onModalOpen = (goal) => {
+        onOpen()
+        setSelectedGoal(goal)
+    }
+
+    const onModalClose = () => {
+        onClose()
+        setSelectedGoal({})
+    }
+
+    const handleDelete = async () => {
+        try {
+            const res = await entryClient.delete(`/goals/${selectedGoal.id}`)
+            toast({ ...toastConfig("success"), description: res.data.message })
+            setGoals(prev => prev.filter(goal => goal.id !== selectedGoal.id))
+            onModalClose()
+        }
+        catch (e) {
+            toast({ ...toastConfig("error"), description: e.response.data.message })
+        }
     }
 
     const handleSubmit = async (inputs) => {
@@ -31,8 +50,7 @@ function GoalPage() {
         <GoalCard
             key={goal.id}
             goal={goal}
-            onDelete={handleDelete}
-            onModalOpen={onOpen} />
+            onModalOpen={onModalOpen} />
     ))
 
     return (
@@ -41,7 +59,10 @@ function GoalPage() {
             <VStack alignItems="start" gap={5} mt={5}>
                 {renderedGoals}
             </VStack>
-            <GoalDeleteModal isOpen={isOpen} onOpen={onOpen} onClose={onClose} />
+            <GoalDeleteModal
+                isOpen={isOpen}
+                onModalClose={onModalClose}
+                onDelete={handleDelete} />
         </>
     )
 }

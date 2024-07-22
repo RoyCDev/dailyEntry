@@ -5,9 +5,9 @@ import { useNavigate } from 'react-router-dom'
 
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
-import entryClient from '../../util.js'
+import { entryClient, toastConfig } from '../../util.js'
 
-function LoginForm({ toggleMode, toast, toastConfig }) {
+function LoginForm({ toggleMode, toast }) {
     const navigate = useNavigate()
     const schema = yup.object({
         username: yup.string().required(),
