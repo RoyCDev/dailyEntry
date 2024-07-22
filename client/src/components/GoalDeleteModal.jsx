@@ -14,17 +14,17 @@ function GoalDeleteModal({ isOpen, onOpen, onClose }) {
         <Modal isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
             <ModalContent>
-                <ModalHeader>Modal Title</ModalHeader>
+                <ModalHeader>Delete goal</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
-                    hi
+                    Are you sure you want to delete this goal?
                 </ModalBody>
 
                 <ModalFooter>
-                    <Button colorScheme='blue' mr={3} onClick={onClose}>
-                        Close
+                    <Button colorScheme='brand' mr={2} onClick={onClose}>
+                        Yes
                     </Button>
-                    <Button variant='ghost'>Secondary Action</Button>
+                    <Button variant='ghost' onClick={onClose}>No</Button>
                 </ModalFooter>
             </ModalContent>
         </Modal>

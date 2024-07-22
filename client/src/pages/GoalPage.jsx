@@ -1,14 +1,14 @@
-import Goal from "../components/Goal"
+import GoalCard from "../components/GoalCard"
 import GoalForm from "../components/GoalForm.jsx"
 import GoalDeleteModal from "../components/GoalDeleteModal.jsx"
 
 import { useState, useEffect } from "react"
-import { VStack } from "@chakra-ui/react"
+import { VStack, useDisclosure } from "@chakra-ui/react"
 import entryClient from "../../util.js"
 
 function GoalPage() {
     const [goals, setGoals] = useState([])
-    console.log(goals)
+    const { isOpen, onOpen, onClose } = useDisclosure()
 
     useEffect(() => {
         const fetchGoals = async () => {
@@ -28,8 +28,12 @@ function GoalPage() {
     }
 
     const renderedGoals = goals.map(goal => (
-        <Goal key={goal.id} goal={goal} onDelete={handleDelete}></Goal>)
-    )
+        <GoalCard
+            key={goal.id}
+            goal={goal}
+            onDelete={handleDelete}
+            onModalOpen={onOpen} />
+    ))
 
     return (
         <>
@@ -37,7 +41,7 @@ function GoalPage() {
             <VStack alignItems="start" gap={5} mt={5}>
                 {renderedGoals}
             </VStack>
-            <GoalDeleteModal />
+            <GoalDeleteModal isOpen={isOpen} onOpen={onOpen} onClose={onClose} />
         </>
     )
 }
