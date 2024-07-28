@@ -1,12 +1,13 @@
 import FormInput from './FormInput.jsx'
 import { useForm } from 'react-hook-form'
 import { Button, Text, HStack, VStack } from '@chakra-ui/react'
+import { useMutation } from "@tanstack/react-query"
 
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
-import { entryClient, toastConfig } from '../../util.js'
+import { entryClient } from '../../util.js'
 
-function SignUpForm({ toggleMode, toast }) {
+function SignUpForm({ toggleMode }) {
     const schema = yup.object({
         username: yup.string().required(),
         email: yup.string().email("invalid email format").required(),
@@ -26,16 +27,12 @@ function SignUpForm({ toggleMode, toast }) {
         formState: { errors }
     } = useForm({ mode: "onTouched", resolver: yupResolver(schema) })
 
-    const onSubmit = async (inputs) => {
-        try {
-            const res = await entryClient.post(`/auth/signup`, inputs)
-            toast({ ...toastConfig("success"), description: res.data.message })
-            toggleMode()
-        }
-        catch (e) {
-            toast({ ...toastConfig("error"), description: e.response.data.message })
-        }
-    }
+    const { mutate: onSubmit } = useMutation({
+        mutationFn: async (inputs) => {
+            return await entryClient.post(`/auth/signup`, inputs)
+        },
+        onSuccess: () => toggleMode()
+    })
 
     return (
         <form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>

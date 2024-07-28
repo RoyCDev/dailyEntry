@@ -2,23 +2,23 @@ import GoalCard from "../components/GoalCard"
 import GoalForm from "../components/GoalForm.jsx"
 import GoalDeleteModal from "../components/GoalDeleteModal.jsx"
 
-import { useState, useEffect } from "react"
-import { VStack, useDisclosure, useToast } from "@chakra-ui/react"
-import { entryClient, toastConfig } from "../../util.js"
+import { useState } from "react"
+import { VStack, useDisclosure } from "@chakra-ui/react"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { entryClient } from "../../util.js"
 
 function GoalPage() {
-    const [goals, setGoals] = useState([])
     const [selectedGoal, setSelectedGoal] = useState({})
     const { isOpen, onOpen, onClose } = useDisclosure()
-    const toast = useToast()
+    const queryClient = useQueryClient()
 
-    useEffect(() => {
-        const fetchGoals = async () => {
+    const { data: goals } = useQuery({
+        queryKey: ["goals"],
+        queryFn: async () => {
             const res = await entryClient.get("/goals")
-            setGoals(res.data.goals)
+            return res.data.goals
         }
-        fetchGoals()
-    }, [])
+    })
 
     const onModalOpen = (goal) => {
         onOpen()
@@ -30,32 +30,40 @@ function GoalPage() {
         setSelectedGoal({})
     }
 
-    const handleDelete = async () => {
-        try {
-            const res = await entryClient.delete(`/goals/${selectedGoal.id}`)
-            toast({ ...toastConfig("success"), description: res.data.message })
-            setGoals(prev => prev.filter(goal => goal.id !== selectedGoal.id))
+    const { mutate: handleCreate } = useMutation({
+        mutationFn: async (inputs) => {
+            return await entryClient.post("/goals", inputs)
+        },
+        onSuccess: () => queryClient.invalidateQueries("goals")
+    })
+
+    const { mutate: handleUpdate } = useMutation({
+        mutationFn: async ({ id, newDesc }) => {
+            return await entryClient.put(`/goals/${id}`, { desc: newDesc })
+        }
+    })
+
+    const { mutate: handleDelete } = useMutation({
+        mutationFn: async () => {
+            return await entryClient.delete(`/goals/${selectedGoal.id}`)
+        },
+        onSuccess: () => {
             onModalClose()
-        }
-        catch (e) {
-            toast({ ...toastConfig("error"), description: e.response.data.message })
-        }
-    }
+            queryClient.invalidateQueries("goals")
+        },
+    })
 
-    const handleSubmit = async (inputs) => {
-        const res = await entryClient.post("/goals", inputs)
-    }
-
-    const renderedGoals = goals.map(goal => (
+    const renderedGoals = goals?.map(goal => (
         <GoalCard
             key={goal.id}
             goal={goal}
-            onModalOpen={onModalOpen} />
+            onModalOpen={onModalOpen}
+            onUpdate={handleUpdate} />
     ))
 
     return (
         <>
-            <GoalForm onSubmit={handleSubmit} />
+            <GoalForm onSubmit={handleCreate} />
             <VStack alignItems="start" gap={5} mt={5}>
                 {renderedGoals}
             </VStack>

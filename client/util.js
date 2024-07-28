@@ -5,11 +5,12 @@ const entryClient = axios.create({
     withCredentials: true
 })
 
-const toastConfig = (status) => ({
+const toastConfig = (status, desc) => ({
     status: status,
+    description: desc,
     position: "top-right",
     duration: 2500,
-    isClosable: true
+    isClosable: true,
 })
 
 export { entryClient, toastConfig }
