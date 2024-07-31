@@ -1,51 +1,76 @@
-import Goal from "../components/Goal"
+import GoalCard from "../components/GoalCard"
+import GoalForm from "../components/GoalForm"
+import GoalTab from "../components/GoalTab"
+import GoalTabPanel from "../components/GoalTabPanel"
+import GoalDeleteModal from "../components/GoalDeleteModal"
+
 import { useState } from "react"
-import entryClient from "../../util.js"
+import {
+    Tabs,
+    TabList,
+    TabPanels,
+    useDisclosure
+} from "@chakra-ui/react"
+import { useQuery } from "@tanstack/react-query"
+import { entryClient } from "../../util.js"
 
 function GoalPage() {
-    const [goals, setGoals] = useState([])
-    const [inputs, setInputs] = useState({})
-    const handleChange = (e) => {
-        setInputs(prev => ({ ...prev, [e.target.name]: e.target.value }))
+    const [selectedGoal, setSelectedGoal] = useState({})
+    const { isOpen, onOpen, onClose } = useDisclosure()
+
+    const { data: goals } = useQuery({
+        queryKey: ["goals"],
+        queryFn: async () => {
+            const res = await entryClient.get("/goals")
+            return res.data.goals
+        }
+    })
+
+    const onModalOpen = (goal) => {
+        onOpen()
+        setSelectedGoal(goal)
     }
 
-    const handleSubmit = async (e) => {
-        e.preventDefault()
-        const res = await entryClient.post("/goals", inputs)
-        console.log(res.data)
+    const onModalClose = () => {
+        onClose()
+        setSelectedGoal({})
     }
 
-    const handleClick = async () => {
-        const res = await entryClient.get("/goals")
-        setGoals(res.data.goals)
-        console.log(res.data.goals)
+    const ongoing = []
+    const completed = []
+
+    for (const goal of goals ?? []) {
+        const card =
+            <GoalCard
+                key={goal.id}
+                goal={goal}
+                onModalOpen={onModalOpen} />
+
+        goal.completed_date ? completed.push(card) : ongoing.push(card)
     }
 
-    const handleDelete = async (id) => {
-        const res = await entryClient.delete(`/goals/${id}`)
-        setGoals(prev => prev.filter(goal => goal.id !== id))
-    }
-
-    const renderedGoals = goals.map(goal => (
-        <Goal key={goal.id} goal={goal} onDelete={handleDelete}></Goal>)
-    )
     return (
-        <>
-            <form action="" onSubmit={handleSubmit}>
-                <button>+</button>
-                <label htmlFor="new-goal"></label>
-                <input type="text" name="desc" id="desc" placeholder="Add a new goal"
-                    value={inputs.desc || ''} onChange={handleChange} />
-                <select name="priority" id="priority" onChange={handleChange}>
-                    <option hidden>select priority</option>
-                    <option value="high">High</option>
-                    <option value="mid">Mid</option>
-                    <option value="low">Low</option>
-                </select>
-            </form>
-            <button onClick={handleClick}>Fetch goals</button>
-            {renderedGoals}
-        </>
+        <Tabs variant="solid-rounded" colorScheme="brand" m="0 auto"
+            maxW={{ md: "97.5%" }}
+            size={{ base: "sm", lg: "md" }}
+            isFitted={{ base: true, lg: false }}>
+            <TabList bg="white" borderRadius="full" w={{ lg: "fit-content" }}>
+                <GoalTab badge={ongoing.length}>Ongoing</GoalTab>
+                <GoalTab badge={completed.length}>Completed</GoalTab>
+            </TabList>
+
+            <GoalForm my={5} />
+
+            <TabPanels>
+                <GoalTabPanel goals={ongoing} />
+                <GoalTabPanel goals={completed} />
+            </TabPanels>
+
+            <GoalDeleteModal
+                isOpen={isOpen}
+                onModalClose={onModalClose}
+                selectedGoal={selectedGoal} />
+        </Tabs >
     )
 }
 

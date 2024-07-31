@@ -1,6 +1,6 @@
 import { List, ListItem, Avatar, Flex, Box, Text } from "@chakra-ui/react"
 import { NavLink, useNavigate } from "react-router-dom"
-import entryClient from "../../util.js"
+import { entryClient } from "../../util.js"
 
 function SideBar() {
     const today = new Date().toLocaleDateString()

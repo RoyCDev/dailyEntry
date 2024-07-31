@@ -1,6 +1,6 @@
 import LoginForm from "../components/LoginForm";
 import SignUpForm from "../components/SignUpForm";
-import { Box, Flex, Heading, Image, Text, useToast } from "@chakra-ui/react";
+import { Box, Flex, Heading, Image, Text } from "@chakra-ui/react";
 import journalImg from "../assets/journal.png"
 import { useState } from "react";
 
@@ -9,14 +9,6 @@ function AuthPage() {
     const toggleMode = () => {
         setIsSignupMode(prev => !prev)
     }
-
-    const toast = useToast()
-    const toastConfig = (status) => ({
-        status: status,
-        position: "top-right",
-        duration: 2500,
-        isClosable: true
-    })
 
     return (
         <Flex
@@ -28,8 +20,8 @@ function AuthPage() {
                 <Heading as="h1" fontWeight={400}>Hello!</Heading>
                 <Text pt={1} pb={8}>Start documenting your life and goals!</Text>
                 {isSignupMode ?
-                    <SignUpForm toggleMode={toggleMode} toast={toast} toastConfig={toastConfig} /> :
-                    <LoginForm toggleMode={toggleMode} toast={toast} toastConfig={toastConfig} />}
+                    <SignUpForm toggleMode={toggleMode} /> :
+                    <LoginForm toggleMode={toggleMode} />}
             </Box>
             <Image src={journalImg} alignSelf="center"
                 boxSize={{ base: "275px", lg: "315px", xl: "400px" }}

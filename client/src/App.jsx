@@ -3,7 +3,11 @@ import AuthPage from "./pages/AuthPage";
 import GoalPage from "./pages/GoalPage";
 import EntryPage from "./pages/EntryPage";
 
+import { useToast } from "@chakra-ui/react";
 import { Route, RouterProvider, createBrowserRouter, createRoutesFromElements } from "react-router-dom";
+import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -16,8 +20,33 @@ const router = createBrowserRouter(
 )
 
 function App() {
+    const toast = useToast({
+        position: "top-right",
+        duration: 2500,
+        isClosable: true,
+    })
+
+    const queryClient = new QueryClient({
+        queryCache: new QueryCache({
+            onError: (e) => toast({
+                status: "error", description: e.response.data.message
+            })
+        }),
+        mutationCache: new MutationCache({
+            onSuccess: (res) => toast({
+                status: "success", description: res.data.message
+            }),
+            onError: (e) => toast({
+                status: "error", description: e.response.data.message
+            })
+        })
+    })
+
     return (
-        <RouterProvider router={router} />
+        <QueryClientProvider client={queryClient}>
+            <RouterProvider router={router} />
+            <ReactQueryDevtools initialIsOpen={false} />
+        </QueryClientProvider>
     )
 }
 
