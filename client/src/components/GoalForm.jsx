@@ -1,23 +1,57 @@
-import FormInput from "../components/FormInput"
+import {
+    Button,
+    Card,
+    CardBody,
+    CardFooter,
+    Checkbox,
+    HStack,
+    Select,
+    Spacer,
+    Text,
+    Textarea
+} from '@chakra-ui/react'
+
+import { AddIcon } from '@chakra-ui/icons'
 import { useForm } from "react-hook-form"
-import { HStack, Select } from "@chakra-ui/react"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { entryClient } from "../../util.js"
 
-function GoalForm({ onSubmit }) {
+function GoalForm({ ...rest }) {
     const {
         register,
         handleSubmit,
+        resetField,
+        watch,
         formState: { errors }
     } = useForm()
 
-    return (
-        <form onSubmit={handleSubmit(onSubmit)}>
-            <HStack>
-                <FormInput type="text"
-                    placeholder="+ Add a new goal"
-                    register={{ ...register("desc") }} />
+    const queryClient = useQueryClient()
 
-                <Select bg="white" borderRadius={12} w="150px"
+    const { mutate: onSubmit } = useMutation({
+        mutationFn: async (inputs) => {
+            return await entryClient.post("/goals", inputs)
+        },
+        onSuccess: () => {
+            resetField("desc")
+            resetField("priority")
+            queryClient.invalidateQueries({ queryKey: ["goals"] })
+        }
+    })
+
+    const status = watch("isCompleted") ? "completed" : "ongoing"
+
+    return (
+        <Card w="100%" variant="outline" borderRadius={12} {...rest}>
+            <HStack px={4} pt={3} alignItems="start">
+                <Checkbox iconSize={16} size="xl" variant="circular" colorScheme="brand"
+                    {...register("isCompleted")} />
+                <CardBody px={3} py={0}>
+                    <Textarea resize="none" rows={2}
+                        placeholder='Add a new goal'
+                        {...register("desc", { required: true })} />
+                </CardBody>
+
+                <Select size="sm" bg="white" borderRadius={12} w="fit-content"
                     {...register("priority", { required: true })}
                     placeholder="Priority">
                     <option value="high">High</option>
@@ -25,7 +59,19 @@ function GoalForm({ onSubmit }) {
                     <option value="low">Low</option>
                 </Select>
             </HStack>
-        </form>
+
+            <CardFooter alignItems="center" pr={2.5} py={1.5}>
+                <Text fontSize="sm" color="gray.500">
+                    Status: {status}
+                </Text>
+                <Spacer />
+                <Button leftIcon={<AddIcon />} fontWeight="400"
+                    onClick={handleSubmit(onSubmit)}
+                    variant="ghost" size="sm">
+                    Create
+                </Button>
+            </CardFooter>
+        </Card>
     )
 }
 

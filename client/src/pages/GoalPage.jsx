@@ -1,16 +1,22 @@
 import GoalCard from "../components/GoalCard"
-import GoalForm from "../components/GoalForm.jsx"
-import GoalDeleteModal from "../components/GoalDeleteModal.jsx"
+import GoalForm from "../components/GoalForm"
+import GoalTab from "../components/GoalTab"
+import GoalTabPanel from "../components/GoalTabPanel"
+import GoalDeleteModal from "../components/GoalDeleteModal"
 
 import { useState } from "react"
-import { VStack, useDisclosure } from "@chakra-ui/react"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import {
+    Tabs,
+    TabList,
+    TabPanels,
+    useDisclosure
+} from "@chakra-ui/react"
+import { useQuery } from "@tanstack/react-query"
 import { entryClient } from "../../util.js"
 
 function GoalPage() {
     const [selectedGoal, setSelectedGoal] = useState({})
     const { isOpen, onOpen, onClose } = useDisclosure()
-    const queryClient = useQueryClient()
 
     const { data: goals } = useQuery({
         queryKey: ["goals"],
@@ -30,48 +36,41 @@ function GoalPage() {
         setSelectedGoal({})
     }
 
-    const { mutate: handleCreate } = useMutation({
-        mutationFn: async (inputs) => {
-            return await entryClient.post("/goals", inputs)
-        },
-        onSuccess: () => queryClient.invalidateQueries("goals")
-    })
+    const ongoing = []
+    const completed = []
 
-    const { mutate: handleUpdate } = useMutation({
-        mutationFn: async ({ id, newDesc }) => {
-            return await entryClient.put(`/goals/${id}`, { desc: newDesc })
-        }
-    })
+    for (const goal of goals ?? []) {
+        const card =
+            <GoalCard
+                key={goal.id}
+                goal={goal}
+                onModalOpen={onModalOpen} />
 
-    const { mutate: handleDelete } = useMutation({
-        mutationFn: async () => {
-            return await entryClient.delete(`/goals/${selectedGoal.id}`)
-        },
-        onSuccess: () => {
-            onModalClose()
-            queryClient.invalidateQueries("goals")
-        },
-    })
-
-    const renderedGoals = goals?.map(goal => (
-        <GoalCard
-            key={goal.id}
-            goal={goal}
-            onModalOpen={onModalOpen}
-            onUpdate={handleUpdate} />
-    ))
+        goal.completed_date ? completed.push(card) : ongoing.push(card)
+    }
 
     return (
-        <>
-            <GoalForm onSubmit={handleCreate} />
-            <VStack alignItems="start" gap={5} mt={5}>
-                {renderedGoals}
-            </VStack>
+        <Tabs variant="solid-rounded" colorScheme="brand" m="0 auto"
+            maxW={{ md: "97.5%" }}
+            size={{ base: "sm", lg: "md" }}
+            isFitted={{ base: true, lg: false }}>
+            <TabList bg="white" borderRadius="full" w={{ lg: "fit-content" }}>
+                <GoalTab badge={ongoing.length}>Ongoing</GoalTab>
+                <GoalTab badge={completed.length}>Completed</GoalTab>
+            </TabList>
+
+            <GoalForm my={5} />
+
+            <TabPanels>
+                <GoalTabPanel goals={ongoing} />
+                <GoalTabPanel goals={completed} />
+            </TabPanels>
+
             <GoalDeleteModal
                 isOpen={isOpen}
                 onModalClose={onModalClose}
-                onDelete={handleDelete} />
-        </>
+                selectedGoal={selectedGoal} />
+        </Tabs >
     )
 }
 

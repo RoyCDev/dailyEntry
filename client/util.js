@@ -5,12 +5,9 @@ const entryClient = axios.create({
     withCredentials: true
 })
 
-const toastConfig = (status, desc) => ({
-    status: status,
-    description: desc,
-    position: "top-right",
-    duration: 2500,
-    isClosable: true,
-})
+const formatDate = (date) => {
+    if (!date) return null
+    return `${date.slice(5, 7)}/${date.slice(8, 10)}/${date.slice(0, 4)}`
+}
 
-export { entryClient, toastConfig }
+export { entryClient, formatDate }

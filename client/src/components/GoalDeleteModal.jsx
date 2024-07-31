@@ -9,7 +9,22 @@ import {
     Button
 } from '@chakra-ui/react'
 
-function GoalDeleteModal({ isOpen, onModalClose, onDelete }) {
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { entryClient } from "../../util.js"
+
+function GoalDeleteModal({ isOpen, onModalClose, selectedGoal }) {
+    const queryClient = useQueryClient()
+
+    const { mutate: handleDelete } = useMutation({
+        mutationFn: async () => {
+            return await entryClient.delete(`/goals/${selectedGoal.id}`)
+        },
+        onSuccess: () => {
+            onModalClose()
+            queryClient.invalidateQueries({ queryKey: ["goals"] })
+        },
+    })
+
     return (
         <Modal isOpen={isOpen} onClose={onModalClose}>
             <ModalOverlay />
@@ -21,10 +36,12 @@ function GoalDeleteModal({ isOpen, onModalClose, onDelete }) {
                 </ModalBody>
 
                 <ModalFooter>
-                    <Button colorScheme='brand' mr={2} onClick={onDelete}>
+                    <Button colorScheme='brand' mr={2} onClick={handleDelete}>
                         Yes
                     </Button>
-                    <Button variant='ghost' onClick={onModalClose}>No</Button>
+                    <Button variant='ghost' onClick={onModalClose}>
+                        No
+                    </Button>
                 </ModalFooter>
             </ModalContent>
         </Modal>

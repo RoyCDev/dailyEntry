@@ -16,27 +16,40 @@ import {
 
 import { useRef } from 'react'
 import EditableControls from './EditableControls'
-import { entryClient } from "../../util.js"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { entryClient, formatDate } from "../../util.js"
 
-function GoalCard({ goal, onModalOpen, onUpdate }) {
+const priorityColors = {
+    high: "green",
+    mid: "yellow",
+    low: "red"
+}
+
+function GoalCard({ goal, onModalOpen }) {
     const ref = useRef()
-    const priorityColors = {
-        high: "green",
-        mid: "yellow",
-        low: "red"
-    }
-    const color = priorityColors[goal.priority]
-    const addedDate = new Date(goal.added_date).toLocaleDateString()
-    const completedDate = goal.completed_date ?
-        new Date(goal.completed_date).toLocaleDateString() :
-        null
+    const queryClient = useQueryClient()
 
-    const handleStatus = async () => {
-        const date = completedDate ?
-            null :
-            new Date().toISOString().slice(0, 10)
-        const res = await entryClient.put(`/goals/${goal.id}`, { completedDate: date })
-    }
+    const color = priorityColors[goal.priority]
+    const addedDate = formatDate(goal.added_date)
+    const completedDate = formatDate(goal.completed_date)
+
+    const { mutate: handleStatus } = useMutation({
+        mutationFn: async () => {
+            const date = completedDate ?
+                null :
+                new Date().toISOString().slice(0, 10)
+            return await entryClient.put(`/goals/${goal.id}`, { completedDate: date })
+        },
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["goals"] })
+    })
+
+    const { mutate: handleDesc } = useMutation({
+        mutationFn: async (newDesc) => {
+            if (newDesc !== goal.description) {
+                return await entryClient.put(`/goals/${goal.id}`, { desc: newDesc })
+            }
+        }
+    })
 
     return (
         <Card w="100%" variant="outline" borderRadius={12}>
@@ -46,7 +59,7 @@ function GoalCard({ goal, onModalOpen, onUpdate }) {
                 <CardBody px={3} py={0}>
                     <Editable defaultValue={goal.description}
                         isPreviewFocusable={false}
-                        onSubmit={(newDesc) => onUpdate({ id: goal.id, newDesc })}>
+                        onSubmit={(newDesc) => handleDesc(newDesc)}>
                         <EditablePreview />
                         <EditableTextarea resize="none" />
                         <Portal containerRef={ref}>
@@ -58,7 +71,7 @@ function GoalCard({ goal, onModalOpen, onUpdate }) {
                 <Tag colorScheme={color}>{goal.priority} priority</Tag>
             </HStack>
 
-            <CardFooter alignItems="center" pr={2.5} py={1.5}>
+            <CardFooter alignItems="center" pr={2.5} py={1.5} mt="auto">
                 <Text fontSize="sm" color="gray.500">
                     {completedDate ?
                         `${addedDate} - ${completedDate}` :

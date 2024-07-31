@@ -1,7 +1,8 @@
 import pool from "../db.js"
 
-const addGoal = async ({ desc, priority }, userid) => {
-    const q = "INSERT INTO goal VALUE (NULL, ?, ?, ?, NOW(), NULL)"
+const addGoal = async ({ desc, priority, isCompleted }, userid) => {
+    const completedDate = isCompleted ? "NOW()" : "NULL"
+    const q = `INSERT INTO goal VALUE (NULL, ?, ?, ?, NOW(), ${completedDate})`
     await pool.execute(q, [userid, desc, priority])
     return { message: "goal is added successfully", code: 201 }
 }
