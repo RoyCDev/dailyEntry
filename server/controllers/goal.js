@@ -8,7 +8,7 @@ const addGoal = async ({ desc, priority, isCompleted }, userid) => {
 }
 
 const getGoals = async (userid) => {
-    const q = "SELECT * FROM goal WHERE user_id = ?"
+    const q = "SELECT * FROM goal WHERE user_id = ? ORDER BY PRIORITY DESC"
     const [res] = await pool.execute(q, [userid])
     return { goals: res, code: 200 }
 }

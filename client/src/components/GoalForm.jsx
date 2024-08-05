@@ -1,3 +1,4 @@
+import FormSelect from './FormSelect'
 import {
     Button,
     Card,
@@ -5,7 +6,6 @@ import {
     CardFooter,
     Checkbox,
     HStack,
-    Select,
     Spacer,
     Text,
     Textarea
@@ -51,13 +51,12 @@ function GoalForm({ ...rest }) {
                         {...register("desc", { required: true })} />
                 </CardBody>
 
-                <Select size="sm" bg="white" borderRadius={12} w="fit-content"
-                    {...register("priority", { required: true })}
-                    placeholder="Priority">
+                <FormSelect size="sm" w="fit-content" placeholder="Priority"
+                    {...register("priority", { required: true })}>
                     <option value="high">High</option>
                     <option value="mid">Mid</option>
                     <option value="low">Low</option>
-                </Select>
+                </FormSelect>
             </HStack>
 
             <CardFooter alignItems="center" pr={2.5} py={1.5}>

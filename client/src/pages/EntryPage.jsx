@@ -1,89 +1,57 @@
-import { useState } from "react"
-
-// function getActivities() {
-//     const cookies = document.cookie.split("; ")
-//     for (const cookie of cookies) {
-//         const [name, value] = cookie.split("=")
-//         if (name === "activities")
-//             return JSON.parse(decodeURIComponent(value).slice(2))
-//     }
-// }
-
-// function updateActivities() {
-
-// }
+import FormInput from "../components/FormInput"
+import TagCheckbox from "../components/TagCheckbox"
+import { Select } from "@chakra-ui/react"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
+import { useForm } from 'react-hook-form'
+import { entryClient } from "../../util.js"
 
 function EntryPage() {
-    // submit form
-    // const [inputs, setInputs] = useState({ activity: [] })
-    // const handleCheckBoxes = (e) => {
-    //     e.target.checked ?
-    //         inputs.activity.push(e.target.value) :
-    //         inputs.activity = inputs.activity.filter(a => a !== e.target.value)
-    //     console.log(inputs.activity)
-    // }
+    const queryClient = useQueryClient()
 
-    // render mood rating options
-    const options = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "very good"]
-    const renderedOptions = options.map((option, i) => {
-        const rating = i + 1
-        return <option key={rating} value={rating}>{rating} - {option}</option>
+    const {
+        register,
+        handleSubmit,
+        watch,
+        resetField,
+        formState: { errors }
+    } = useForm()
+
+    const { data: activities } = useQuery({
+        queryKey: ["activities"],
+        queryFn: async () => {
+            const res = await entryClient.get("/entries/activity")
+            return res.data.activities
+        }
     })
 
-    // sub form - add new activity
-    const [newActivity, setNewActivity] = useState("")
-    const handleNewActivity = (e) => setNewActivity(e.target.value)
+    const newActivity = watch("newActivity")
+    const selectedActivities = watch("activities")
 
-    const handleAdd = () => {
-        setNewActivity("")
+    const addActivity = (inputs) => {
+        console.log(inputs)
+        queryClient.setQueryData(["activities"], (prev) => (
+            prev.includes(newActivity) ? prev : [...prev, newActivity]
+        ))
+        resetField("newActivity")
     }
 
-    // render user activities
-    // const [activities, setActivities] = useState(["Activity 1", "Activity 2", "Activity 3"])
-    // const renderedActivities = activities.map((a) => {
-    //     return (
-    //         <>
-    //             <input type="checkbox" name="activity" id={a} value={a} onChange={handleCheckBoxes} hidden />
-    //             <label htmlFor={a}>{a}</label>
-    //         </>
-    //     )
-    // })
-
-    // const handleAdd = (e) => {
-    //     setActivities([...activities, newActivity])
-    //     setNewActivity("")
-    // }
-
+    const renderedActivities = activities?.map((activity) => (
+        <TagCheckbox key={activity}
+            name="activities"
+            value={activity}
+            register={{ ...register("activities") }}>
+            {activity}
+        </TagCheckbox>
+    ))
 
     return (
-        <form action="">
-            <label htmlFor="diary"></label>
-            <textarea name="diary" id="diary"></textarea>
-            <br></br>
-
-            <label htmlFor="date"></label>
-            Date: <input type="date" name="date" id="date" />
-            <br></br>
-
-            Mood Rating:
-            <select name="rating" id="rating">
-                <option hidden>Choose mood</option>
-                {renderedOptions}
-            </select>
-
-            <br></br>
-            <br></br>
-
-            <input type="button" name="add" id="add" value="+" onClick={handleAdd} />
-            <input type="text" name="new-activity" id="new-activity"
-                value={newActivity} onChange={handleNewActivity}
+        <form onSubmit={handleSubmit(addActivity)}>
+            <FormInput size="sm" label="Activities" placeholder="+ Add a new activity"
+                register={{ ...register("newActivity") }}
             />
-            <br></br>
-
-            {/* {renderedActivities} */}
+            {renderedActivities}
         </form>
-
     )
 }
 
-export default EntryPage;
+export default EntryPage

@@ -4,7 +4,7 @@ function GoalTabPanel({ goals }) {
     return (
         <TabPanel p={0}>
             <SimpleGrid
-                columns={{ base: 1, xl: 1 }}
+                columns={{ base: 1, lg: 1 }}
                 spacing={5}>
                 {goals}
             </SimpleGrid>
