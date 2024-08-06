@@ -52,7 +52,7 @@ function GoalForm({ ...rest }) {
                 </CardBody>
 
                 <FormSelect size="sm" w="fit-content" placeholder="Priority"
-                    {...register("priority", { required: true })}>
+                    register={{ ...register("priority", { required: true }) }}>
                     <option value="high">High</option>
                     <option value="mid">Mid</option>
                     <option value="low">Low</option>
@@ -70,7 +70,7 @@ function GoalForm({ ...rest }) {
                     Create
                 </Button>
             </CardFooter>
-        </Card>
+        </Card >
     )
 }
 

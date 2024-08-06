@@ -12,10 +12,10 @@ function TagCheckbox({ children, name, value, register }) {
     return (
         <chakra.label {...htmlProps}>
             <input type="checkbox" {...getInputProps()}{...getCheckboxProps()} hidden />
-            <Tag {...getLabelProps()}
-                colorScheme={state.isChecked ? "brand" : null}
-                _hover={{ bg: state.isChecked ? "brand.600" : "gray.200" }}
-                variant={state.isChecked ? "solid" : "subtle"}>
+            <Tag {...getLabelProps()} px={3} borderRadius="full"
+                colorScheme="brand"
+                _hover={{ bg: state.isChecked ? "brand.600" : "blackAlpha.100" }}
+                variant={state.isChecked ? "solid" : "outline"}>
                 {children}
             </Tag>
         </chakra.label>
