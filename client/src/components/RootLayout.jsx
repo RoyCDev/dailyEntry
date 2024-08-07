@@ -10,7 +10,7 @@ function RootLayout() {
                 <SideBar />
             </GridItem>
 
-            <GridItem bg="#e8e8e8" px={5} pt={5}
+            <GridItem bg="#e8e8e8" px={{ base: 5, lg: 7, xl: 10 }} pt={5}
                 colSpan={{ base: 20, md: 14, lg: 15, xl: 16 }} >
                 <Outlet />
             </GridItem>

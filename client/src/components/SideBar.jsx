@@ -41,7 +41,7 @@ function SideBar() {
                     New Entry</NavLink>
             </ListItem>
             <ListItem>
-                <NavLink>Journal History</NavLink>
+                <NavLink to="/history">Journal History</NavLink>
             </ListItem>
             <ListItem>
                 <NavLink to="/goal">Goals</NavLink>
