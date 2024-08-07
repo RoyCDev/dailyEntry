@@ -13,13 +13,13 @@ import {
 } from "@chakra-ui/react"
 import { InfoIcon } from '@chakra-ui/icons'
 
-import { useRef } from "react"
-import { useQuery, useQueryClient } from "@tanstack/react-query"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useForm } from 'react-hook-form'
+import { useNavigate } from "react-router-dom"
 import { entryClient } from "../../util.js"
 
 function EntryPage() {
-    const ref = useRef()
+    const navigate = useNavigate()
     const queryClient = useQueryClient()
 
     const {
@@ -30,9 +30,12 @@ function EntryPage() {
         formState: { errors }
     } = useForm()
 
-    const onSubmit = (inputs) => {
-        console.log(inputs)
-    }
+    const { mutate: onSubmit } = useMutation({
+        mutationFn: async (inputs) => {
+            return await entryClient.post("/entries", inputs)
+        },
+        onSuccess: () => navigate("/history")
+    })
 
     const { data: activities } = useQuery({
         queryKey: ["activities"],

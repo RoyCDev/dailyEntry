@@ -12,4 +12,22 @@ const getActivities = async (userid) => {
     return ({ activities, code: 200 })
 }
 
-export { getActivities }
+const addEntry = async ({ diary, date, rating, activities }, userid) => {
+    let q = "SELECT * FROM entry WHERE user_id = ? AND date = ?"
+    const [res] = await pool.execute(q, [userid, date])
+    if (res.length !== 0)
+        return ({ message: "an entry for this date already exists", code: 409 })
+
+    const conn = await pool.getConnection();
+    await conn.beginTransaction()
+    q = "INSERT INTO entry VALUE (NULL, ?, ?, ?, ?)"
+    const [{ insertId: entryId }] = await conn.execute(q, [userid, date, rating, diary])
+    const values = activities.map(activity => [entryId, activity])
+    q = "INSERT INTO entryActivity VALUES ?"
+    await conn.query(q, [values])
+    await conn.commit()
+
+    return ({ message: "entry is added successfully", code: 201 })
+}
+
+export { getActivities, addEntry }
