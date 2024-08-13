@@ -15,25 +15,17 @@ import { entryClient } from "../../util.js"
 function DeleteModal({ isOpen, onModalClose, selectedGoal, selectedEntry }) {
     const queryClient = useQueryClient()
 
-    const { mutate: handleDelete } = selectedGoal ?
-        useMutation({
-            mutationFn: async () => {
-                return await entryClient.delete(`/goals/${selectedGoal.id}`)
-            },
-            onSuccess: () => {
-                onModalClose()
-                queryClient.invalidateQueries({ queryKey: ["goals"] })
-            },
-        }) :
-        useMutation({
-            mutationFn: async () => {
-                return await entryClient.delete(`/entries/${selectedEntry.id}`)
-            },
-            onSuccess: () => {
-                onModalClose()
-                queryClient.invalidateQueries({ queryKey: ["entries"] })
-            },
-        })
+    const { mutate: handleDelete } = useMutation({
+        mutationFn: async () => {
+            return selectedGoal ?
+                await entryClient.delete(`/goals/${selectedGoal.id}`) :
+                await entryClient.delete(`/entries/${selectedEntry.id}`)
+        },
+        onSuccess: () => {
+            onModalClose()
+            queryClient.invalidateQueries({ queryKey: selectedGoal ? ["goals"] : ["entries"] })
+        },
+    })
 
     return (
         <Modal isOpen={isOpen} onClose={onModalClose}>

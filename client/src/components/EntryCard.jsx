@@ -8,6 +8,7 @@ import {
     Tag
 } from "@chakra-ui/react"
 import { EditIcon, DeleteIcon } from '@chakra-ui/icons'
+import { useNavigate } from 'react-router-dom'
 
 const moodColors = [
     "red", "red", "red",
@@ -16,6 +17,7 @@ const moodColors = [
 ]
 
 function EntryCard({ entry, onModalOpen }) {
+    const navigate = useNavigate()
     const color = moodColors[entry.mood - 1]
 
     return (
@@ -29,7 +31,8 @@ function EntryCard({ entry, onModalOpen }) {
                 <Tag colorScheme={color}>{entry.mood}/10</Tag>
                 <Spacer />
                 <ButtonGroup variant="ghost" size="sm" spacing={0}>
-                    <Button leftIcon={<EditIcon />} fontWeight="400">
+                    <Button leftIcon={<EditIcon />} fontWeight="400"
+                        onClick={() => navigate(`/entry/${entry.id}`)}>
                         Edit
                     </Button>
                     <Button leftIcon={<DeleteIcon />} fontWeight="400"

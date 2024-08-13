@@ -36,16 +36,26 @@ const getEntries = async (userid) => {
     return ({ entries: res, code: 200 })
 }
 
+const getEntry = async (entryid) => {
+    let q = "SELECT * FROM entry WHERE id = ?"
+    const [entry] = await pool.execute(q, [entryid])
+    q = "SELECT * FROM entryActivity WHERE entry_id = ?"
+    const [res] = await pool.execute(q, [entryid])
+    const activities = res.map(obj => obj.activity)
+
+    return ({ entry: { ...entry[0], activities }, code: 200 })
+}
+
 const deleteEntry = async (entryid) => {
     const conn = await pool.getConnection();
     await conn.beginTransaction()
     let q = "DELETE FROM entryActivity WHERE entry_id = ?"
-    await pool.execute(q, [entryid])
+    await conn.execute(q, [entryid])
     q = "DELETE FROM entry WHERE id = ?"
-    await pool.execute(q, [entryid])
+    await conn.execute(q, [entryid])
     await conn.commit()
 
     return ({ message: "entry is deleted successfully", code: 200 })
 }
 
-export { getActivities, addEntry, getEntries, deleteEntry }
+export { getActivities, addEntry, getEntries, getEntry, deleteEntry }

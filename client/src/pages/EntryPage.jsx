@@ -1,9 +1,8 @@
 import FormInput from "../components/FormInput"
 import FormSelect from "../components/FormSelect"
-import TagCheckbox from "../components/TagCheckbox"
+import ActivityForm from "../components/ActivityForm"
 import {
     Button,
-    Flex,
     HStack,
     Grid,
     GridItem,
@@ -13,14 +12,24 @@ import {
 } from "@chakra-ui/react"
 import { InfoIcon } from '@chakra-ui/icons'
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { useQuery, useMutation } from "@tanstack/react-query"
 import { useForm } from 'react-hook-form'
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { entryClient } from "../../util.js"
 
 function EntryPage() {
     const navigate = useNavigate()
-    const queryClient = useQueryClient()
+    const { id } = useParams()
+
+    const { data: entry, isPending } = useQuery({
+        queryKey: ["entry", id],
+        queryFn: async () => {
+            const res = await entryClient.get(`/entries/${id}`)
+            return res.data.entry
+        },
+        refetchOnWindowFocus: false,
+        enabled: !!id
+    })
 
     const {
         register,
@@ -28,43 +37,24 @@ function EntryPage() {
         getValues,
         resetField,
         formState: { errors }
-    } = useForm()
+    } = useForm({
+        values: {
+            diary: entry?.description || "",
+            date: entry?.date || null,
+            rating: entry?.mood || null,
+            newActivity: "",
+            activities: entry?.activities || []
+        }
+    })
 
     const { mutate: onSubmit } = useMutation({
         mutationFn: async (inputs) => {
-            return await entryClient.post("/entries", inputs)
+            return id ?
+                await entryClient.post("/entries", inputs) :
+                await entryClient.put(`/entries/${id}`, inputs)
         },
         onSuccess: () => navigate("/history")
     })
-
-    const { data: activities } = useQuery({
-        queryKey: ["activities"],
-        queryFn: async () => {
-            const res = await entryClient.get("/entries/activity")
-            return res.data.activities
-        },
-        refetchOnWindowFocus: false
-    })
-
-    const addActivity = (e) => {
-        if (e.keyCode !== 13) return;
-
-        e.preventDefault()
-        const newActivity = getValues("newActivity")?.toLowerCase()
-        queryClient.setQueryData(["activities"], (prev) => (
-            prev.includes(newActivity) ? prev : [...prev, newActivity]
-        ))
-        resetField("newActivity")
-    }
-
-    const renderedActivities = activities?.map((activity) => (
-        <TagCheckbox key={activity}
-            name="activities"
-            value={activity}
-            register={{ ...register("activities") }}>
-            {activity}
-        </TagCheckbox>
-    ))
 
     const options = [
         "it's the worst",
@@ -84,6 +74,13 @@ function EntryPage() {
         return <option key={rating} value={rating}>{rating} - {option}</option>
     })
 
+    const submitButton = (display) => (
+        <Button type="submit" display={display}
+            w="100%" colorScheme="brand" borderRadius={12} mt={6}>
+            {id ? "Edit" : "Create"} Entry
+        </Button>
+    )
+
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
             <Grid templateColumns="repeat(20, 1fr)"
@@ -94,10 +91,7 @@ function EntryPage() {
                         h={{ lg: "90vh" }}
                         {...register("diary", { required: true })} />
 
-                    <Button type="submit" display={{ lg: "none" }}
-                        w="100%" colorScheme="brand" borderRadius={12} mt={6}>
-                        Create Entry
-                    </Button>
+                    {submitButton({ lg: "none" })}
                 </GridItem>
 
                 <GridItem colSpan={{ base: 20, lg: 8, xl: 7 }} order={{ base: 1, lg: 2 }}>
@@ -115,16 +109,8 @@ function EntryPage() {
                         </FormSelect>
                     </VStack>
 
-                    <FormInput size="sm" label="Activities" type="text"
-                        placeholder="+ Add a new activity"
-                        register={{ ...register("newActivity") }}
-                        onKeyDown={addActivity} />
-                    <Flex gap={1.5} mt={3} wrap="wrap">{renderedActivities}</Flex>
-
-                    <Button type="submit" display={{ base: "none", lg: "inline-flex" }}
-                        w="100%" colorScheme="brand" borderRadius={12} mt={12}>
-                        Create Entry
-                    </Button>
+                    <ActivityForm register={register} getValues={getValues} resetField={resetField} />
+                    {submitButton({ base: "none", lg: "inline-flex" })}
                 </GridItem>
             </Grid>
         </form>
