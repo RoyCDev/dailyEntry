@@ -11,23 +11,19 @@ function EditableControls({ onModalOpen }) {
 
     return isEditing ? (
         <ButtonGroup variant="ghost" size="sm" spacing={0}>
-            <Button leftIcon={<CheckIcon />} fontWeight="400"
-                {...getSubmitButtonProps()}>
+            <Button leftIcon={<CheckIcon />} {...getSubmitButtonProps()}>
                 Save
             </Button>
-            <Button leftIcon={<CloseIcon />} fontWeight="400"
-                {...getCancelButtonProps()}>
+            <Button leftIcon={<CloseIcon />} {...getCancelButtonProps()}>
                 Cancel
             </Button>
         </ButtonGroup>
     ) : (
         <ButtonGroup variant="ghost" size="sm" spacing={0}>
-            <Button leftIcon={<EditIcon />} fontWeight="400"
-                {...getEditButtonProps()}>
+            <Button leftIcon={<EditIcon />} {...getEditButtonProps()}>
                 Edit
             </Button>
-            <Button leftIcon={<DeleteIcon />} fontWeight="400"
-                onClick={onModalOpen}>
+            <Button leftIcon={<DeleteIcon />} onClick={onModalOpen}>
                 Delete
             </Button>
         </ButtonGroup>

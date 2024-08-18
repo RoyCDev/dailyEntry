@@ -1,4 +1,4 @@
-import { getActivities, addEntry, getEntries, getEntry, deleteEntry } from "../controllers/entry.js"
+import { getActivities, addEntry, getEntries, getEntry, updateEntry, deleteEntry } from "../controllers/entry.js"
 import express from "express"
 
 const router = express.Router()
@@ -31,6 +31,14 @@ router.get("/:id", async (req, res) => {
     if (req.session.isAuthenticated) {
         const { entry, code } = await getEntry(req.params.id)
         return res.status(code).json({ entry })
+    }
+    return res.status(401).json({ message: "unauthoirzed access" })
+})
+
+router.put("/:id", async (req, res) => {
+    if (req.session.isAuthenticated) {
+        const { message, code } = await updateEntry(req.body, req.params.id, req.session.user.id)
+        return res.status(code).json({ message })
     }
     return res.status(401).json({ message: "unauthoirzed access" })
 })

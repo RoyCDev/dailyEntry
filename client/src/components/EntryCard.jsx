@@ -31,11 +31,11 @@ function EntryCard({ entry, onModalOpen }) {
                 <Tag colorScheme={color}>{entry.mood}/10</Tag>
                 <Spacer />
                 <ButtonGroup variant="ghost" size="sm" spacing={0}>
-                    <Button leftIcon={<EditIcon />} fontWeight="400"
+                    <Button leftIcon={<EditIcon />}
                         onClick={() => navigate(`/entry/${entry.id}`)}>
                         Edit
                     </Button>
-                    <Button leftIcon={<DeleteIcon />} fontWeight="400"
+                    <Button leftIcon={<DeleteIcon />}
                         onClick={() => onModalOpen(entry)}>
                         Delete
                     </Button>

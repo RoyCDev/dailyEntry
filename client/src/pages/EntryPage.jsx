@@ -12,13 +12,22 @@ import {
 } from "@chakra-ui/react"
 import { InfoIcon } from '@chakra-ui/icons'
 
-import { useQuery, useMutation } from "@tanstack/react-query"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useForm } from 'react-hook-form'
 import { useNavigate, useParams } from "react-router-dom"
 import { entryClient } from "../../util.js"
 
+function SubmitButton({ id, display }) {
+    return (
+        <Button type="submit" display={display} variant="submit" mt={6}>
+            {id ? "Save Changes" : "Create Entry"}
+        </Button>
+    )
+}
+
 function EntryPage() {
     const navigate = useNavigate()
+    const queryClient = useQueryClient()
     const { id } = useParams()
 
     const { data: entry, isPending } = useQuery({
@@ -39,9 +48,9 @@ function EntryPage() {
         formState: { errors }
     } = useForm({
         values: {
-            diary: entry?.description || "",
+            description: entry?.description || "",
             date: entry?.date || null,
-            rating: entry?.mood || null,
+            mood: entry?.mood || null,
             newActivity: "",
             activities: entry?.activities || []
         }
@@ -50,10 +59,13 @@ function EntryPage() {
     const { mutate: onSubmit } = useMutation({
         mutationFn: async (inputs) => {
             return id ?
-                await entryClient.post("/entries", inputs) :
-                await entryClient.put(`/entries/${id}`, inputs)
+                await entryClient.put(`/entries/${id}`, inputs) :
+                await entryClient.post("/entries", inputs)
         },
-        onSuccess: () => navigate("/history")
+        onSuccess: () => {
+            if (id) queryClient.invalidateQueries({ queryKey: ["entry", id] })
+            navigate("/history")
+        }
     })
 
     const options = [
@@ -74,13 +86,6 @@ function EntryPage() {
         return <option key={rating} value={rating}>{rating} - {option}</option>
     })
 
-    const submitButton = (display) => (
-        <Button type="submit" display={display}
-            w="100%" colorScheme="brand" borderRadius={12} mt={6}>
-            {id ? "Edit" : "Create"} Entry
-        </Button>
-    )
-
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
             <Grid templateColumns="repeat(20, 1fr)"
@@ -89,9 +94,9 @@ function EntryPage() {
                     <Textarea bg="white" resize="none" borderRadius={12}
                         minH={{ base: "300px", lg: "600px" }}
                         h={{ lg: "90vh" }}
-                        {...register("diary", { required: true })} />
+                        {...register("description", { required: true })} />
 
-                    {submitButton({ lg: "none" })}
+                    <SubmitButton id={id} display={{ lg: "none" }} />
                 </GridItem>
 
                 <GridItem colSpan={{ base: 20, lg: 8, xl: 7 }} order={{ base: 1, lg: 2 }}>
@@ -104,13 +109,13 @@ function EntryPage() {
                             register={{ ...register("date", { required: true }) }} />
                         <FormSelect size="sm" label="Mood Rating"
                             placeholder="Choose mood"
-                            register={{ ...register("rating", { required: true }) }}>
+                            register={{ ...register("mood", { required: true }) }}>
                             {renderedOptions}
                         </FormSelect>
                     </VStack>
 
                     <ActivityForm register={register} getValues={getValues} resetField={resetField} />
-                    {submitButton({ base: "none", lg: "inline-flex" })}
+                    <SubmitButton id={id} display={{ base: "none", lg: "inline-flex" }} />
                 </GridItem>
             </Grid>
         </form>

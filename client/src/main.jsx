@@ -1,29 +1,12 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { checkboxAnatomy } from '@chakra-ui/anatomy'
-import { ChakraProvider, extendTheme, createMultiStyleConfigHelpers, defineStyle } from '@chakra-ui/react'
+import { ChakraProvider, extendTheme } from '@chakra-ui/react'
 import App from './App.jsx'
 
+import { checkboxTheme } from './themes/checkbox.jsx'
+import { buttonTheme } from './themes/button.jsx'
+
 import '@fontsource-variable/montserrat';
-
-// customizing checkbox theme
-const { definePartsStyle, defineMultiStyleConfig } =
-  createMultiStyleConfigHelpers(checkboxAnatomy.keys)
-
-const sizes = {
-  xl: definePartsStyle({
-    control: defineStyle({
-      boxSize: 12
-    }),
-  }),
-}
-const circular = definePartsStyle({
-  control: defineStyle({
-    rounded: "full"
-  })
-})
-
-const checkboxTheme = defineMultiStyleConfig({ sizes, variants: { circular } })
 
 const theme = extendTheme({
   fonts: {
@@ -33,7 +16,7 @@ const theme = extendTheme({
   colors: {
     brand: { 500: "#51645d", 600: "#41504a", 700: "#313c38" }
   },
-  components: { Checkbox: checkboxTheme }
+  components: { Checkbox: checkboxTheme, Button: buttonTheme }
 })
 
 ReactDOM.createRoot(document.getElementById('root')).render(

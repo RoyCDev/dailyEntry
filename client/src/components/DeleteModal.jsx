@@ -38,10 +38,10 @@ function DeleteModal({ isOpen, onModalClose, selectedGoal, selectedEntry }) {
                 </ModalBody>
 
                 <ModalFooter>
-                    <Button colorScheme='brand' mr={2} onClick={handleDelete}>
+                    <Button colorScheme='brand' mr={2} onClick={handleDelete} fontWeight={600}>
                         Yes
                     </Button>
-                    <Button variant='ghost' onClick={onModalClose}>
+                    <Button variant='ghost' onClick={onModalClose} fontWeight={600}>
                         No
                     </Button>
                 </ModalFooter>
