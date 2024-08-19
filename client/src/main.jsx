@@ -14,7 +14,7 @@ const theme = extendTheme({
     body: "Montserrat Variable, sans-serif"
   },
   colors: {
-    brand: { 500: "#51645d", 600: "#41504a", 700: "#313c38" }
+    brand: { 400: "#677f76", 500: "#51645d", 600: "#41504a", 700: "#313c38" }
   },
   components: { Checkbox: checkboxTheme, Button: buttonTheme }
 })

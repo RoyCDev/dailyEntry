@@ -21,7 +21,7 @@ router.post("/", async (req, res) => {
 
 router.get("/", async (req, res) => {
     if (req.session.isAuthenticated) {
-        const { entries, code } = await getEntries(req.session.user.id)
+        const { entries, code } = await getEntries(req.query, req.session.user.id)
         return res.status(code).json({ entries })
     }
     return res.status(401).json({ message: "unauthoirzed access" })

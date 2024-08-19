@@ -49,7 +49,7 @@ function EntryPage() {
     } = useForm({
         values: {
             description: entry?.description || "",
-            date: entry?.date || null,
+            date: entry?.date.slice(0, 10) || null,
             mood: entry?.mood || null,
             newActivity: "",
             activities: entry?.activities || []

@@ -30,9 +30,14 @@ const addEntry = async ({ description, date, mood, activities }, userid) => {
     return ({ message: "entry is added successfully", code: 201 })
 }
 
-const getEntries = async (userid) => {
-    const q = "SELECT * FROM entry WHERE user_id = ? ORDER BY date DESC"
-    const [res] = await pool.execute(q, [userid])
+const getEntries = async ({ year, month }, userid) => {
+    const q = `
+    SELECT * FROM entry 
+    WHERE user_id = ? 
+    AND YEAR(date) = ?
+    AND MONTH(date) = ?
+    ORDER BY date DESC`
+    const [res] = await pool.execute(q, [userid, year, month])
     return ({ entries: res, code: 200 })
 }
 

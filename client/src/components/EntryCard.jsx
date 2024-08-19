@@ -22,8 +22,7 @@ function EntryCard({ entry, onModalOpen }) {
 
     return (
         <Card w="100%" variant="outline" borderRadius={12}>
-            <CardBody px={7} pt={3}>
-                {entry.date} <br />
+            <CardBody pt={3}>
                 {entry.description}
             </CardBody>
 

@@ -15,6 +15,7 @@ import {
 } from '@chakra-ui/react'
 
 import { useRef } from 'react'
+import { format } from "date-fns"
 import EditableControls from './EditableControls'
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { entryClient, formatDate } from "../../util.js"
@@ -37,7 +38,7 @@ function GoalCard({ goal, onModalOpen }) {
         mutationFn: async () => {
             const date = completedDate ?
                 null :
-                new Date().toISOString().slice(0, 10)
+                format(new Date(), "yyyy-MM-dd")
             return await entryClient.put(`/goals/${goal.id}`, { completedDate: date })
         },
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ["goals"] })
