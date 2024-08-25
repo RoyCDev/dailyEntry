@@ -8,7 +8,9 @@ import {
     GridItem,
     Text,
     Textarea,
-    VStack
+    VStack,
+    Show,
+    Hide
 } from "@chakra-ui/react"
 import { InfoIcon } from '@chakra-ui/icons'
 
@@ -17,9 +19,9 @@ import { useForm } from 'react-hook-form'
 import { useNavigate, useParams } from "react-router-dom"
 import { entryClient } from "../../util.js"
 
-function SubmitButton({ id, display }) {
+function SubmitButton({ id }) {
     return (
-        <Button type="submit" display={display} variant="submit" mt={6}>
+        <Button type="submit" variant="submit" mt={6}>
             {id ? "Save Changes" : "Create Entry"}
         </Button>
     )
@@ -37,8 +39,11 @@ function EntryPage() {
             return res.data.entry
         },
         refetchOnWindowFocus: false,
+        retry: false,
         enabled: !!id
     })
+
+    if (!isPending && !entry) navigate(-1)
 
     const {
         register,
@@ -96,7 +101,7 @@ function EntryPage() {
                         h={{ lg: "90vh" }}
                         {...register("description", { required: true })} />
 
-                    <SubmitButton id={id} display={{ lg: "none" }} />
+                    <Hide above="lg"><SubmitButton id={id} /></Hide>
                 </GridItem>
 
                 <GridItem colSpan={{ base: 20, lg: 8, xl: 7 }} order={{ base: 1, lg: 2 }}>
@@ -115,7 +120,7 @@ function EntryPage() {
                     </VStack>
 
                     <ActivityForm register={register} getValues={getValues} resetField={resetField} />
-                    <SubmitButton id={id} display={{ base: "none", lg: "inline-flex" }} />
+                    <Show above="lg"><SubmitButton id={id} /></Show>
                 </GridItem>
             </Grid>
         </form>

@@ -22,9 +22,11 @@ const addEntry = async ({ description, date, mood, activities }, userid) => {
     await conn.beginTransaction()
     q = "INSERT INTO entry VALUE (NULL, ?, ?, ?, ?)"
     const [{ insertId: entryid }] = await conn.execute(q, [userid, date, mood, description])
-    const values = activities.map(activity => [entryid, activity])
-    q = "INSERT INTO entryActivity VALUES ?"
-    await conn.query(q, [values])
+    if (activities.length !== 0) {
+        const values = activities.map(activity => [entryid, activity])
+        q = "INSERT INTO entryActivity VALUES ?"
+        await conn.query(q, [values])
+    }
     await conn.commit()
 
     return ({ message: "entry is added successfully", code: 201 })
@@ -41,9 +43,13 @@ const getEntries = async ({ year, month }, userid) => {
     return ({ entries: res, code: 200 })
 }
 
-const getEntry = async (entryid) => {
+const getEntry = async (entryid, userid) => {
     let q = "SELECT * FROM entry WHERE id = ?"
     const [entry] = await pool.execute(q, [entryid])
+    if (entry[0]["user_id"] !== userid) {
+        return { message: "unauthoirzed access", code: 401 }
+    }
+
     q = "SELECT * FROM entryActivity WHERE entry_id = ?"
     const [res] = await pool.execute(q, [entryid])
     const activities = res.map(obj => obj.activity)
@@ -65,8 +71,8 @@ const updateEntry = async ({ description, date, mood, activities }, entryid, use
 
     q = "DELETE FROM entryActivity WHERE entry_id = ?"
     await conn.query(q, [entryid])
-    const values = activities.map(activity => [entryid, activity])
     if (activities.length !== 0) {
+        const values = activities.map(activity => [entryid, activity])
         q = "INSERT INTO entryActivity VALUES ?"
         await conn.query(q, [values])
     }
