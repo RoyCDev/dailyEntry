@@ -1,9 +1,8 @@
 import FormInput from "../components/FormInput"
 import FormSelect from "../components/FormSelect"
-import TagCheckbox from "../components/TagCheckbox"
+import ActivityForm from "../components/ActivityForm"
 import {
     Button,
-    Flex,
     HStack,
     Grid,
     GridItem,
@@ -15,12 +14,31 @@ import { InfoIcon } from '@chakra-ui/icons'
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useForm } from 'react-hook-form'
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { entryClient } from "../../util.js"
+
+function SubmitButton({ id, display }) {
+    return (
+        <Button type="submit" display={display} variant="submit" mt={6}>
+            {id ? "Save Changes" : "Create Entry"}
+        </Button>
+    )
+}
 
 function EntryPage() {
     const navigate = useNavigate()
     const queryClient = useQueryClient()
+    const { id } = useParams()
+
+    const { data: entry, isPending } = useQuery({
+        queryKey: ["entry", id],
+        queryFn: async () => {
+            const res = await entryClient.get(`/entries/${id}`)
+            return res.data.entry
+        },
+        refetchOnWindowFocus: false,
+        enabled: !!id
+    })
 
     const {
         register,
@@ -28,43 +46,27 @@ function EntryPage() {
         getValues,
         resetField,
         formState: { errors }
-    } = useForm()
+    } = useForm({
+        values: {
+            description: entry?.description || "",
+            date: entry?.date.slice(0, 10) || null,
+            mood: entry?.mood || null,
+            newActivity: "",
+            activities: entry?.activities || []
+        }
+    })
 
     const { mutate: onSubmit } = useMutation({
         mutationFn: async (inputs) => {
-            return await entryClient.post("/entries", inputs)
+            return id ?
+                await entryClient.put(`/entries/${id}`, inputs) :
+                await entryClient.post("/entries", inputs)
         },
-        onSuccess: () => navigate("/history")
+        onSuccess: () => {
+            if (id) queryClient.invalidateQueries({ queryKey: ["entry", id] })
+            navigate("/history")
+        }
     })
-
-    const { data: activities } = useQuery({
-        queryKey: ["activities"],
-        queryFn: async () => {
-            const res = await entryClient.get("/entries/activity")
-            return res.data.activities
-        },
-        refetchOnWindowFocus: false
-    })
-
-    const addActivity = (e) => {
-        if (e.keyCode !== 13) return;
-
-        e.preventDefault()
-        const newActivity = getValues("newActivity")?.toLowerCase()
-        queryClient.setQueryData(["activities"], (prev) => (
-            prev.includes(newActivity) ? prev : [...prev, newActivity]
-        ))
-        resetField("newActivity")
-    }
-
-    const renderedActivities = activities?.map((activity) => (
-        <TagCheckbox key={activity}
-            name="activities"
-            value={activity}
-            register={{ ...register("activities") }}>
-            {activity}
-        </TagCheckbox>
-    ))
 
     const options = [
         "it's the worst",
@@ -92,12 +94,9 @@ function EntryPage() {
                     <Textarea bg="white" resize="none" borderRadius={12}
                         minH={{ base: "300px", lg: "600px" }}
                         h={{ lg: "90vh" }}
-                        {...register("diary", { required: true })} />
+                        {...register("description", { required: true })} />
 
-                    <Button type="submit" display={{ lg: "none" }}
-                        w="100%" colorScheme="brand" borderRadius={12} mt={6}>
-                        Create Entry
-                    </Button>
+                    <SubmitButton id={id} display={{ lg: "none" }} />
                 </GridItem>
 
                 <GridItem colSpan={{ base: 20, lg: 8, xl: 7 }} order={{ base: 1, lg: 2 }}>
@@ -110,21 +109,13 @@ function EntryPage() {
                             register={{ ...register("date", { required: true }) }} />
                         <FormSelect size="sm" label="Mood Rating"
                             placeholder="Choose mood"
-                            register={{ ...register("rating", { required: true }) }}>
+                            register={{ ...register("mood", { required: true }) }}>
                             {renderedOptions}
                         </FormSelect>
                     </VStack>
 
-                    <FormInput size="sm" label="Activities" type="text"
-                        placeholder="+ Add a new activity"
-                        register={{ ...register("newActivity") }}
-                        onKeyDown={addActivity} />
-                    <Flex gap={1.5} mt={3} wrap="wrap">{renderedActivities}</Flex>
-
-                    <Button type="submit" display={{ base: "none", lg: "inline-flex" }}
-                        w="100%" colorScheme="brand" borderRadius={12} mt={12}>
-                        Create Entry
-                    </Button>
+                    <ActivityForm register={register} getValues={getValues} resetField={resetField} />
+                    <SubmitButton id={id} display={{ base: "none", lg: "inline-flex" }} />
                 </GridItem>
             </Grid>
         </form>

@@ -47,7 +47,7 @@ function SignUpForm({ toggleMode }) {
                     register={{ ...register("password") }}
                     message={errors.password?.message} />
             </VStack>
-            <Button type="submit" w="100%" colorScheme="brand" borderRadius={12} my={12}>
+            <Button type="submit" variant="submit" my={12}>
                 Sign Up
             </Button>
             <HStack gap={1}>

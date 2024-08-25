@@ -12,16 +12,18 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { entryClient } from "../../util.js"
 
-function GoalDeleteModal({ isOpen, onModalClose, selectedGoal }) {
+function DeleteModal({ isOpen, onModalClose, selectedGoal, selectedEntry }) {
     const queryClient = useQueryClient()
 
     const { mutate: handleDelete } = useMutation({
         mutationFn: async () => {
-            return await entryClient.delete(`/goals/${selectedGoal.id}`)
+            return selectedGoal ?
+                await entryClient.delete(`/goals/${selectedGoal.id}`) :
+                await entryClient.delete(`/entries/${selectedEntry.id}`)
         },
         onSuccess: () => {
             onModalClose()
-            queryClient.invalidateQueries({ queryKey: ["goals"] })
+            queryClient.invalidateQueries({ queryKey: selectedGoal ? ["goals"] : ["entries"] })
         },
     })
 
@@ -29,17 +31,17 @@ function GoalDeleteModal({ isOpen, onModalClose, selectedGoal }) {
         <Modal isOpen={isOpen} onClose={onModalClose}>
             <ModalOverlay />
             <ModalContent>
-                <ModalHeader>Delete goal</ModalHeader>
+                <ModalHeader>Delete {selectedGoal ? "goal" : "entry"}</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
-                    Are you sure you want to delete this goal?
+                    Are you sure you want to delete this {selectedGoal ? "goal" : "entry"}?
                 </ModalBody>
 
                 <ModalFooter>
-                    <Button colorScheme='brand' mr={2} onClick={handleDelete}>
+                    <Button colorScheme='brand' mr={2} onClick={handleDelete} fontWeight={600}>
                         Yes
                     </Button>
-                    <Button variant='ghost' onClick={onModalClose}>
+                    <Button variant='ghost' onClick={onModalClose} fontWeight={600}>
                         No
                     </Button>
                 </ModalFooter>
@@ -48,4 +50,4 @@ function GoalDeleteModal({ isOpen, onModalClose, selectedGoal }) {
     )
 }
 
-export default GoalDeleteModal
+export default DeleteModal

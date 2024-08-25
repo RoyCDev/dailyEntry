@@ -2,7 +2,7 @@ import GoalCard from "../components/GoalCard"
 import GoalForm from "../components/GoalForm"
 import GoalTab from "../components/GoalTab"
 import GoalTabPanel from "../components/GoalTabPanel"
-import GoalDeleteModal from "../components/GoalDeleteModal"
+import DeleteModal from "../components/DeleteModal"
 
 import { useState } from "react"
 import {
@@ -66,7 +66,7 @@ function GoalPage() {
                 <GoalTabPanel goals={completed} />
             </TabPanels>
 
-            <GoalDeleteModal
+            <DeleteModal
                 isOpen={isOpen}
                 onModalClose={onModalClose}
                 selectedGoal={selectedGoal} />
