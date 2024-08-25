@@ -2,9 +2,10 @@ import MonthDisplay from "../components/MonthDisplay"
 import EntryDate from "../components/EntryDate"
 import EntryCard from "../components/EntryCard"
 import DeleteModal from "../components/DeleteModal"
+import Calendar from "../components/Calendar.jsx"
 
 import { format } from "date-fns"
-import { Stack, SimpleGrid, useDisclosure } from "@chakra-ui/react"
+import { Grid, GridItem, Stack, SimpleGrid, useDisclosure } from "@chakra-ui/react"
 import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { entryClient } from "../../util.js"
@@ -54,19 +55,35 @@ function HistoryPage() {
     ))
 
     return (
-        <>
-            <MonthDisplay
-                currentMonth={currentMonth}
-                formattedMonth={formattedMonth}
-                setCurrentMonth={setCurrentMonth}
-                score={score} />
-            <SimpleGrid gap={5} mt={5}>{renderedEntries}</SimpleGrid>
-            <DeleteModal
-                isOpen={isOpen}
-                onModalClose={onModalClose}
-                selectedEntry={selectedEntry}
-            />
-        </>
+        <Grid
+            templateAreas={{
+                base: `"header" "main"`,
+                lg: `"header header" "main side"`
+            }}
+            gridTemplateColumns={{ lg: "1fr 225px" }}
+            maxW="950px"
+            m="0 auto"
+            columnGap={5}
+        >
+            <GridItem area="header">
+                <MonthDisplay
+                    currentMonth={currentMonth}
+                    setCurrentMonth={setCurrentMonth}
+                    score={score} />
+            </GridItem>
+
+            <GridItem area="main">
+                <SimpleGrid gap={5} mt={5}>{renderedEntries}</SimpleGrid>
+                <DeleteModal
+                    isOpen={isOpen}
+                    onModalClose={onModalClose}
+                    selectedEntry={selectedEntry} />
+            </GridItem>
+
+            <GridItem area="side" display={{ base: "none", lg: "block" }}>
+                <Calendar currentMonth={currentMonth} />
+            </GridItem>
+        </Grid>
     )
 }
 

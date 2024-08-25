@@ -1,8 +1,10 @@
-import { addMonths } from 'date-fns'
+import { addMonths, format } from 'date-fns'
 import { Button, ButtonGroup, Flex, Text } from "@chakra-ui/react"
 import { ArrowLeftIcon, ArrowRightIcon } from '@chakra-ui/icons'
 
-function MonthDisplay({ currentMonth, formattedMonth, setCurrentMonth, score }) {
+function MonthDisplay({ currentMonth, setCurrentMonth, score }) {
+    const formattedMonth = format(currentMonth, "MMM yyyy")
+
     return (
         <>
             <Flex justifyContent="center" color="white" bg="brand.500" borderRadius={12} pt={1}>
